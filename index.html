@@ -21,7 +21,8 @@
   --red: #E8262A;        /* rojo de la sombra de los títulos */
   --silver: #DCDCDC;     /* gris plata */
   --live: #34C26B;       /* verde: reporte disponible */
-  --soonc: #9AA7BC;      /* gris: reporte próximamente */
+  --prog: #FF9F1A;       /* naranja: In Progress to be in OSA */
+  --plan: #E8262A;       /* rojo: Not Planned Yet */
   /* Texto y superficies */
   --ink: #F5F7FB;        /* texto principal */
   --muted: #9AA7BC;      /* texto atenuado */
@@ -170,8 +171,10 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
 .sec-tools { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
 .legend { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--live); }
-.dot.soon { background: transparent; box-shadow: inset 0 0 0 2px var(--soonc); }
+.dot.prog { background: var(--prog); }
+.dot.plan { background: transparent; box-shadow: inset 0 0 0 2px var(--plan); }
 .allbtn { padding: 6px 16px; border: 1px solid var(--line); border-radius: 999px; background: none; font-size: 12px; font-weight: 600; color: var(--ink); cursor: pointer; transition: border-color .2s, color .2s; }
 .allbtn:hover { border-color: var(--gold); color: var(--gold); }
 
@@ -219,8 +222,11 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
 .rp svg { flex: none; width: 13px; height: 13px; opacity: 0; transform: translate(-3px, 3px); transition: opacity .2s, transform .2s; color: var(--c2); }
 a.rp:hover { background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 1px var(--c2); transform: translateY(-1px); }
 a.rp:hover svg { opacity: 1; transform: none; }
-.rp.soon { cursor: default; font-style: italic; color: var(--muted); background: rgba(255, 255, 255, .02); }
-.rp.soon em { flex: none; font-style: normal; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.rp.nolink { cursor: default; }
+.rp.plan { font-style: italic; color: color-mix(in srgb, var(--ink) 88%, transparent); background: rgba(232, 38, 42, .05); box-shadow: inset 0 0 0 1px rgba(232, 38, 42, .65); }
+/* Self Service: fila sin flechas, solo tarjetas en línea */
+.mflat { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 92px; padding: 8px 6px; animation: stepin .55s cubic-bezier(.2, .9, .25, 1.05) both; }
+.mflat .rp { flex: 0 1 220px; }
 
 /* =====================================================================
    5. SECCIÓN "REPORTES": botón-banner y panel con buscador, filtros y tarjetas
@@ -350,7 +356,7 @@ a.rp:hover svg { opacity: 1; transform: none; }
         <div>
           <p class="eyebrow">Explore. Connect. Discover.</p>
           <h1>Driving Our E2E Business Performance Management Processes</h1>
-          <p>Conoce los reportes de OSA Matrix y navega por las diferentes áreas y subprocesos para encontrar la información que impulsa tus decisiones.</p>
+          <p>Get to know the OSA Matrix reports and navigate through the different processes to find the information that drives your decisions.</p>
         </div>
         <!-- Las 3 cifras las rellena el script (id="kpis"); no escribir números a mano -->
         <div class="kpis" id="kpis"></div>
@@ -370,7 +376,7 @@ a.rp:hover svg { opacity: 1; transform: none; }
           <p>Haga clic en una sección para desplegar sus procesos y reportes.</p>
         </div>
         <div class="sec-tools">
-          <div class="legend"><span><i class="dot"></i>Disponible</span><span><i class="dot soon"></i>Próximamente</span></div>
+          <div class="legend"><span><i class="dot"></i>Live <b id="lg-live"></b></span><span><i class="dot prog"></i>In Progress to be in OSA <b id="lg-prog"></b></span><span><i class="dot plan"></i>Not Planned Yet <b id="lg-plan"></b></span></div>
           <button class="allbtn" id="allbtn" type="button">Desplegar todo</button>
         </div>
       </div>
@@ -442,60 +448,71 @@ var URLS = {
   "Daily Sell In vs IBP": "https://app.powerbi.com/reportEmbed?reportId=26e40156-9a24-4ffe-9a49-89682ee1ae73&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Daily Sales Performance MT": "https://app.powerbi.com/reportEmbed?reportId=bb39d1e4-0af3-4823-92e9-f3fb3a874289&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Daily Sales Performance TT": "https://app.powerbi.com/reportEmbed?reportId=a4979cb1-21b5-4b92-9c2a-48b8d9da5dad&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
-  "SFA & SFB SO": "https://app.powerbi.com/reportEmbed?reportId=65830bd6-a207-41d8-8c03-698eafd45cec&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  "SFA & SFB SO - SFA & SFB SI": "https://app.powerbi.com/reportEmbed?reportId=65830bd6-a207-41d8-8c03-698eafd45cec&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Coverage": "https://app.powerbi.com/reportEmbed?reportId=f949623d-ee90-4e26-9a2c-36bbe1e9d0f4&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
-  "New Product Development": "https://app.powerbi.com/reportEmbed?reportId=078d9c46-db9a-4085-ad21-7e4a2ad2341e&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  "New Product Development NPDs": "https://app.powerbi.com/reportEmbed?reportId=078d9c46-db9a-4085-ad21-7e4a2ad2341e&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  "Quiebre CS&L O2B": "https://app.powerbi.com/reportEmbed?reportId=ae397f40-e6bf-40e6-8400-c6c136519f47&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  "Daily SI WACAM": "https://app.powerbi.com/reportEmbed?reportId=4ba3df01-3ed9-43fb-bbbf-40269f01f9ec&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Pacing (comparable customers)": "https://app.powerbi.com/reportEmbed?reportId=b8a2e354-4020-4960-9c43-7b9d9066597c&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Architect": "https://app.powerbi.com/reportEmbed?reportId=8945a4a5-5399-4415-bbba-263e75285463&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "RGM Battleship": "https://app.powerbi.com/reportEmbed?reportId=140f903a-b5ec-43da-a72a-2eac07dcd007&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
-  "Share of Market (Cencosud)": "https://app.powerbi.com/reportEmbed?reportId=27fdb63b-b615-4a03-8e48-912820d60941&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
-  "Sanity Check (data quality)": "https://app.powerbi.com/reportEmbed?reportId=84f28641-2955-438c-8005-0c23c4badb67&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  // "Share of Market (Cencosud)": "https://app.powerbi.com/reportEmbed?reportId=27fdb63b-b615-4a03-8e48-912820d60941&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",   // (ya no aparece en la lámina)
+  "Sanity Check": "https://app.powerbi.com/reportEmbed?reportId=84f28641-2955-438c-8005-0c23c4badb67&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Executive SO": "https://app.powerbi.com/reportEmbed?reportId=4d2bf7bc-528c-4887-9c3b-4f2421885785&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "360° Country": "https://app.powerbi.com/reportEmbed?reportId=b6700382-2b55-48e4-94df-ea9fa376a016&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
-  "Stock Analysis": "https://app.powerbi.com/reportEmbed?reportId=6fc0491f-1a86-4c8b-adb5-c1056891d533&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
+  "Customer Stock Analysis": "https://app.powerbi.com/reportEmbed?reportId=6fc0491f-1a86-4c8b-adb5-c1056891d533&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   "Business Review (Strategic)": "https://app.powerbi.com/reportEmbed?reportId=01be5865-bbdc-4181-8d30-c0aac344da40&autoAuth=true&ctid=18a01ad8-9727-498a-a47d-17374c6fd9f7",
   // "Macroeconomics (LatinFocus)": "https://app.powerbi.com/...",
 };
 
-/* ============ DATOS ============ */
+/* ============ DATOS ============
+   Cada reporte lleva un prefijo con su estado:
+     L| = Live (live)      P| = In Progress to be in OSA      N| = Not Planned Yet
+   El enlace (si existe) se toma de URLS con el nombre exacto. Un reporte L| sin enlace aparece
+   con punto verde pero sin poder abrirse. "flat: true" = fila sin flechas (Self Service). */
 var SECTIONS = [
-  { id: "dp", name: "Demand Planning & IBP", cadence: "Monthly cycle", color: "#3D8BFF", groups: [
-    { name: "Business Drivers Alignment", reports: ["Macroeconomics (LatinFocus)", "A&C Media Investment", "Innovation volume estimates"] },
-    { name: "Pre-Demand Review", reports: ["Historico SI & SO", "Trade Stocks Weekly", "SO→SI & stock extrapolation (o9)"] },
-    { name: "Demand Review", reports: ["Daily SO vs IBP", "Daily Sell In vs IBP"] },
-    { name: "Supply Review", reports: ["CFR Governance IBP", "S4 orders & deliveries"] },
-    { name: "Integrated Reconciliation", reports: ["Financial forecast / P&L (SAC)", "R&O log"] }
+  { id: "ibp", name: "IBP Process", cadence: "Monthly cycle", color: "#3D8BFF", groups: [
+    { name: "Activation Meeting", reports: ["N|Business Drivers Alignment", "N|A&C Media investment", "N|Innovation volume estimates"] },
+    { name: "Demand Review", reports: ["L|Historico SI & SO", "L|Trade Stocks Weekly", "P|SO→SI & stock extrapolation (o9)", "L|SFA & SFB SO - SFA & SFB SI"] },
+    { name: "Supply Review", reports: ["N|Planned Stock in plant"] },
+    { name: "S&OE", reports: ["L|Quiebre CS&L O2B", "N|S4 orders & deliveries", "L|Pacing (comparable customers)"] }
   ]},
-  { id: "soe", name: "Sales Execution (S&OE)", cadence: "Daily / weekly", color: "#FEBF02", groups: [
-    { name: "Targets & Quota", reports: ["Daily Sell In vs Quota"] },
-    { name: "Daily Performance Tracking", reports: ["Daily Sales Performance MT", "Daily Sales Performance TT", "SFA & SFB SO"] },
-    { name: "Coverage & Distribution", reports: ["Coverage", "New Product Development", "Ecomm sell-out"] },
-    { name: "Pacing & Corrective Actions", reports: ["Pacing (comparable customers)", "Deck SI SFA BIAS"] }
+  { id: "ce", name: "Commercial Execution", cadence: "Daily / weekly", color: "#FEBF02", groups: [
+    { name: "Targets & Quota", reports: ["L|Daily Sell In vs IBP", "L|Daily SO vs IBP", "L|360° Country"] },
+    { name: "Daily Performance Tracking", reports: ["L|Daily Sales Performance MT", "L|Daily Sales Performance TT", "L|Quiebre CS&L O2B", "L|Daily SI WACAM"] },
+    { name: "Coverage & Distribution", reports: ["L|Coverage", "L|New Product Development NPDs", "P|Ecomm sell-out"] },
+    { name: "Post - Evaluation", reports: ["N|Gaps analysis & Opps"] }
   ]},
-  { id: "rgm", name: "RGM & Trade Promotion", cadence: "Monthly / per event", color: "#F07800", groups: [
-    { name: "Price-Pack Architecture", reports: ["Architect", "RGM Battleship"] },
-    { name: "Market & Competitive Read", reports: ["Share of Market (Cencosud)", "Nielsen market data"] },
-    { name: "Promo Planning & Accruals", reports: ["Trade promo plan & accruals"] },
-    { name: "Post-Event Evaluation", reports: ["Trade ROI / promo post-eval"] }
+  { id: "bcp", name: "Business Continuity & Projects", cadence: "Monthly / per event", color: "#F07800", groups: [
+    { name: "Price-Pack Architecture", reports: ["L|RGM Battleship", "N|Price index control"] },
+    { name: "Market & Competitive Read", reports: ["P|Scan data MT", "P|Nielsen market data"] },
+    { name: "Promo Planning & Accruals", reports: ["N|Trade promo plan & accruals"] },
+    { name: "Post-Event Evaluation", reports: ["N|Trade ROI / promo post-eval"] }
   ]},
-  { id: "bpr", name: "BPR – Business Performance Review", cadence: "Monthly", color: "#A07CE6", groups: [
-    { name: "Month Close & Actuals", reports: ["Sanity Check (data quality)", "S4 actuals feed"] },
-    { name: "Performance vs Plan", reports: ["Executive SO", "360° Country"] },
-    { name: "Gap & Root-Cause Analysis", reports: ["Stock Analysis", "Customer P&L view"] },
-    { name: "R&O & Action Plan", reports: ["Action / R&O tracker"] },
-    { name: "Leadership Review", reports: ["Business Review (Strategic)", "BPR deck consolidation"] }
+  { id: "bp", name: "Business Performance", cadence: "Monthly", color: "#A07CE6", groups: [
+    { name: "Month Close", reports: ["L|Sanity Check", "N|S4 actuals feed"] },
+    { name: "Performance vs Plan", reports: ["L|Executive SO", "L|360° Country", "L|Business Review (Strategic)", "N|BPR consolidation"] },
+    { name: "Gap & Root-Cause Analysis", reports: ["L|Customer Stock Analysis", "N|Customer P&L view"] },
+    { name: "Integrated Reconciliation", reports: ["N|Monetization / P&L (SAC)", "N|R&O log"] }
+  ]},
+  { id: "ss", name: "Self Service", cadence: "Flexible reports", color: "#9AA7BC", groups: [
+    { name: "Flexible reports", flat: true, reports: ["L|Architect", "P|Architect SI", "P|Architect SO"] }
   ]}
 ];
 
+var STATUS_NAME = { L: "live", P: "prog", N: "plan" };
 SECTIONS.forEach(function (s) {
   s.groups = s.groups.map(function (g) {
-    return { name: g.name, label: g.name, reports: g.reports.map(function (n) { return { name: n, url: URLS[n] || "" }; }) };
+    return { name: g.name, label: g.name, flat: !!g.flat, reports: g.reports.map(function (t) {
+      var n = t.slice(2);
+      return { name: n, status: STATUS_NAME[t.charAt(0)], url: URLS[n] || "" };
+    }) };
   });
 });
 
 function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
 function secCount(s) { return s.groups.reduce(function (n, g) { return n + g.reports.length; }, 0); }
-function plural(n) { return n + (n === 1 ? " report" : " reports"); }
+function procCount(s) { return s.groups.filter(function (g) { return !g.flat; }).length; }
 
 /* ============ AYUDAS ============ */
 var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -505,40 +522,49 @@ var TOTAL = SECTIONS.reduce(function (n, s) { return n + secCount(s); }, 0);
 function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
 /* Color del texto sobre cada sección (el dorado necesita texto oscuro para leerse) */
-var TEXT_ON = { soe: "#1A1200" };
+var TEXT_ON = { ce: "#1A1200", ss: "#0B1020" };
 
 /* Cifras de resumen */
 document.getElementById("kpis").innerHTML =
   '<div class="kpi"><b>' + TOTAL + '</b><span>Reportes</span></div>' +
   '<div class="kpi"><b>' + SECTIONS.length + '</b><span>Secciones</span></div>' +
-  '<div class="kpi"><b>' + SECTIONS.reduce(function (n, s) { return n + s.groups.length; }, 0) + '</b><span>Procesos</span></div>';
+  '<div class="kpi"><b>' + SECTIONS.reduce(function (n, s) { return n + procCount(s); }, 0) + '</b><span>Procesos</span></div>';
 
 /* =====================================================================
    MATRIZ: cada sección es una fila. Al pulsarla, a la derecha se despliegan
    sus procesos como flechas y, debajo de cada flecha, sus reportes.
    ===================================================================== */
 var matrix = document.getElementById("matrix");
+var CNT = { live: 0, prog: 0, plan: 0 };
+SECTIONS.forEach(function (s) { s.groups.forEach(function (g) { g.reports.forEach(function (r) { CNT[r.status]++; }); }); });
+["live", "prog", "plan"].forEach(function (k) { document.getElementById("lg-" + k).textContent = CNT[k]; });
 
 /* Reporte: con enlace = tarjeta clicable (punto verde); sin enlace = "Soon" (punto vacío) */
 function pill(r) {
-  if (!r.url) return '<span class="rp soon"><i class="dot soon"></i><span class="rn">' + esc(r.name) + '</span><em>Soon</em></span>';
-  return '<a class="rp" href="' + esc(r.url) + '" target="_blank" rel="noopener"><i class="dot"></i><span class="rn">' + esc(r.name) + "</span>" + ARROW + "</a>";
+  var dot = '<i class="dot' + (r.status === "live" ? "" : " " + r.status) + '"></i>';
+  var body = dot + '<span class="rn">' + esc(r.name) + "</span>";
+  if (r.url) return '<a class="rp ' + r.status + '" href="' + esc(r.url) + '" target="_blank" rel="noopener">' + body + ARROW + "</a>";
+  return '<span class="rp nolink ' + r.status + '">' + body + "</span>";
 }
 
 /* Fila completa de una sección */
 function rowHTML(s) {
-  var steps = s.groups.map(function (g, i) {
-    return '<div class="mstep" style="--i:' + i + '"><div class="mhead"><span>' + esc(g.name) + '</span></div>' +
-      '<div class="mrep">' + g.reports.map(pill).join("") + "</div></div>";
-  }).join("");
+  var flat = s.groups.length === 1 && s.groups[0].flat;
+  var inner = flat
+    ? '<div class="mflat">' + s.groups[0].reports.map(pill).join("") + "</div>"
+    : '<div class="mflow" style="--n:' + s.groups.length + '">' + s.groups.map(function (g, i) {
+        return '<div class="mstep" style="--i:' + i + '"><div class="mhead"><span>' + esc(g.name) + '</span></div>' +
+          '<div class="mrep">' + g.reports.map(pill).join("") + "</div></div>";
+      }).join("") + "</div>";
+  var cnt = flat ? secCount(s) + " reportes" : procCount(s) + " procesos · " + secCount(s) + " reportes";
   return '<article class="mrow" data-id="' + s.id + '" style="--c:' + s.color + ";--on:" + (TEXT_ON[s.id] || "#fff") + '">' +
     '<button class="mlabel" type="button" aria-expanded="false" aria-controls="d-' + s.id + '">' +
       '<span class="mname">' + esc(s.name) + "</span>" +
       '<span class="mcad">' + esc(s.cadence) + "</span>" +
-      '<span class="mcnt">' + s.groups.length + " procesos · " + secCount(s) + " reportes</span>" + BIG_ARROW.replace("<svg", '<svg class="mgo"') +
+      '<span class="mcnt">' + cnt + "</span>" + BIG_ARROW.replace("<svg", '<svg class="mgo"') +
     "</button>" +
-    '<div class="mhint">' + BIG_ARROW + "<span>Clic para desplegar los procesos</span></div>" +
-    '<div class="mdetail" id="d-' + s.id + '" hidden><div class="mflow" style="--n:' + s.groups.length + '">' + steps + "</div></div>" +
+    '<div class="mhint">' + BIG_ARROW + "<span>Clic para desplegar " + (flat ? "los reportes" : "los procesos") + "</span></div>" +
+    '<div class="mdetail" id="d-' + s.id + '" hidden>' + inner + "</div>" +
   "</article>";
 }
 matrix.innerHTML = SECTIONS.map(rowHTML).join("");
@@ -571,24 +597,26 @@ document.getElementById("allbtn").addEventListener("click", function () {
 var REPORTS = [];
 SECTIONS.forEach(function (s) {
   s.groups.forEach(function (g) {
-    g.reports.forEach(function (r) { REPORTS.push({ name: r.name, url: r.url, sec: s, grp: g.label }); });
+    g.reports.forEach(function (r) { REPORTS.push({ name: r.name, url: r.url, status: r.status, sec: s, grp: g.label }); });
   });
 });
 var rf = { q: "", sec: "" };
 document.getElementById("rn").textContent = REPORTS.length;
 
+var STAT_TAG = { prog: ["In progress", "#FF9F1A"], plan: ["Not planned", "#E8262A"] };
 function reportCard(x) {
+  var tag = STAT_TAG[x.status]
+    ? '<span class="ptag" style="--c:' + tag0(x) + '"><i></i>' + STAT_TAG[x.status][0] + "</span>"
+    : '<span class="ptag" style="--c:' + x.sec.color + '"><i></i>' + esc(x.sec.cadence) + "</span>";
   if (!x.url) {
-    return '<div class="rcard soon" aria-disabled="true">' +
-      '<span class="rtop"><b>' + esc(x.name) + "</b></span>" +
-      '<span class="rsub">' + esc(x.grp) + "</span>" +
-      '<span class="ptags"><span class="ptag" style="--c:' + x.sec.color + '"><i></i>Soon</span></span></div>';
+    return '<div class="rcard soon" aria-disabled="true"><span class="rtop"><b>' + esc(x.name) + "</b></span>" +
+      '<span class="rsub">' + esc(x.grp) + '</span><span class="ptags">' + tag + "</span></div>";
   }
   return '<a class="rcard" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
     '<span class="rtop"><b>' + esc(x.name) + "</b>" + ARROW + "</span>" +
-    '<span class="rsub">' + esc(x.grp) + "</span>" +
-    '<span class="ptags"><span class="ptag" style="--c:' + x.sec.color + '"><i></i>' + esc(x.sec.cadence) + "</span></span></a>";
+    '<span class="rsub">' + esc(x.grp) + '</span><span class="ptags">' + tag + "</span></a>";
 }
+function tag0(x) { return STAT_TAG[x.status][1]; }
 
 function renderFilters() {
   var opts = [{ id: "", t: "Todas", c: "#DCDCDC" }].concat(SECTIONS.map(function (s) { return { id: s.id, t: s.name, c: s.color }; }));
