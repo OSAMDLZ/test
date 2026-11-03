@@ -20,6 +20,8 @@
   --purple: #A07CE6;     /* morado de la campaña (tipo "Analítico") */
   --red: #E8262A;        /* rojo de la sombra de los títulos */
   --silver: #DCDCDC;     /* gris plata */
+  --live: #34C26B;       /* verde: reporte disponible */
+  --soonc: #9AA7BC;      /* gris: reporte próximamente */
   /* Texto y superficies */
   --ink: #F5F7FB;        /* texto principal */
   --muted: #9AA7BC;      /* texto atenuado */
@@ -164,86 +166,61 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
 .sec-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 30px; line-height: 1.1; letter-spacing: .03em; text-transform: uppercase; }
 .sec-head p { margin: 4px 0 0; color: var(--muted); }
 
-/* ----- 4.1 Ruta (Área › Subproceso + Reiniciar) ----- */
-.crumbs { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; min-height: 36px; padding: 4px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.crumbs .lbl { margin-right: 8px; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
-.crumbs .empty, .crumbs .chev { color: var(--muted); }
-.crumbs .chev { padding: 0 2px; }
-.crumb { display: inline-flex; align-items: center; gap: 8px; padding: 5px 8px; border: 0; border-radius: 6px; background: none; font-weight: 600; color: var(--ink); cursor: pointer; }
-.crumb i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
-.crumb:hover { background: rgba(255, 255, 255, .08); }
-.crumb.current { color: #fff; cursor: default; }
-.crumb.current:hover { background: none; }
-.reset { margin-left: auto; padding: 4px 14px; border: 1px solid var(--line); border-radius: 6px; background: none; font-size: 12px; font-weight: 600; color: var(--ink); cursor: pointer; }
-.reset:hover { border-color: var(--gold); color: var(--gold); }
+/* ----- 4.1 Leyenda y botón "Desplegar todo" (a la derecha del título) ----- */
+.sec-tools { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
+.legend { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--live); }
+.dot.soon { background: transparent; box-shadow: inset 0 0 0 2px var(--soonc); }
+.allbtn { padding: 6px 16px; border: 1px solid var(--line); border-radius: 999px; background: none; font-size: 12px; font-weight: 600; color: var(--ink); cursor: pointer; transition: border-color .2s, color .2s; }
+.allbtn:hover { border-color: var(--gold); color: var(--gold); }
 
-/* ----- 4.2 Árbol: tarjeta > zona deslizable > cuadrícula de 4 columnas (Total › Área › Subproceso › Reporte) ----- */
-.tree-card { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: radial-gradient(520px 340px at 0% 50%, rgba(0, 64, 149, .32), transparent 72%), var(--panel); }
-.tree-scroll { overflow-x: auto; overflow-y: hidden; padding: 22px 24px 28px; scrollbar-width: thin; scrollbar-color: rgba(61, 139, 255, .5) transparent; }
-.tree { position: relative; display: grid; grid-template-columns: repeat(4, minmax(200px, 1fr)); column-gap: clamp(36px, 4vw, 64px); min-width: 940px; min-height: 540px; }
-.links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }   /* capa SVG de las líneas */
-.col { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; transition: opacity .5s ease; }
-.col.locked { opacity: 0; visibility: hidden; pointer-events: none; }   /* oculta hasta elegir el paso anterior */
-.nodes { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
-.swipe { display: none; text-align: center; font-size: 12px; color: var(--muted); }   /* solo en pantallas pequeñas */
+/* ----- 4.2 MATRIZ: una fila por sección. Izquierda = botón de la sección; derecha = flechas de procesos ----- */
+.matrix { display: flex; flex-direction: column; gap: 12px; }
+.mrow { --c: #3D8BFF; --on: #fff;   /* color de la sección y color del texto sobre ese color (los asigna el script) */
+  display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 12px; align-items: stretch;
+  padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: border-color .3s, box-shadow .3s; }
+.mrow.open { border-color: color-mix(in srgb, var(--c) 55%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 25%, transparent), 0 10px 30px rgba(0, 0, 0, .35); }
 
-.colhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; min-height: 58px; padding-bottom: 7px; border-bottom: 2px solid var(--ac); transition: border-color .4s; }
-.colhead.blank { border-bottom-color: transparent; }
-.colhead b { display: block; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
-.colhead .val { display: block; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--muted); overflow-wrap: anywhere; }
-.colhead .q { display: block; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--gold); animation: ask 2.4s ease-in-out infinite; }
-.colhead .x { padding: 0 6px; border: 0; border-radius: 6px; background: none; font-size: 20px; line-height: 1; color: var(--muted); cursor: pointer; }
-.colhead .x:hover { color: #fff; background: rgba(255, 255, 255, .1); }
-@keyframes ask { 50% { opacity: .6; } }
+/* Botón de la sección (bloque de color a la izquierda) */
+.mlabel { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 92px; padding: 14px 44px 14px 18px; border: 0; border-radius: 10px; text-align: left; cursor: pointer;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 78%, #000) 0, color-mix(in srgb, var(--c) 42%, #000) 100%); color: #fff; transition: filter .2s, transform .2s; }
+.mlabel:hover { filter: brightness(1.15); }
+.mlabel .mname { font-size: 15px; font-weight: 600; line-height: 1.25; }
+.mlabel .mcad { font-size: 12px; font-style: italic; opacity: .85; }
+.mlabel .mcnt { margin-top: 6px; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+.mlabel .mgo { position: absolute; right: 14px; top: 50%; width: 22px; height: 22px; margin-top: -11px; transition: transform .35s cubic-bezier(.3, .9, .3, 1.2); }
+.mrow.open .mgo { transform: translateX(6px) scale(1.1); }
 
-/* ----- 4.3 Nodos: ".node" = Área o Subproceso (botón); ".report" = reporte final (enlace) ----- */
-.node, .report {
-  --c: #3D8BFF;   /* el script asigna el color de cada nodo */
-  position: relative; display: block; width: 100%; padding: 9px 10px 10px; border: 0; border-radius: 8px; background: transparent;
-  text-align: left; text-decoration: none; color: var(--ink); cursor: pointer; transform-origin: left center; transition: background .2s, opacity .25s;
-}
-.node:hover, .report:hover { background: rgba(255, 255, 255, .06); }
-.bar { display: block; height: 6px; border-radius: 2px; background: rgba(220, 220, 220, .14); overflow: hidden; }   /* barra proporcional */
-.bar i { display: block; height: 100%; border-radius: 2px; background: var(--c); transition: width .6s; }
-.name { display: block; margin-top: 7px; font-size: 13px; font-weight: 500; line-height: 1.35; color: color-mix(in srgb, var(--ink) 86%, transparent); overflow-wrap: anywhere; }
-.count { display: block; font-size: 12px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
-.node:hover .name, .report:hover .name { color: #fff; }
-/* Seleccionado (naranja) y atenuado el resto */
-.node.sel { background: color-mix(in srgb, var(--c) 13%, transparent); }
-.node.sel .name { color: #fff; font-weight: 600; }
-.node.sel .count { color: var(--ink); }
-.node.sel .bar { box-shadow: 0 0 10px color-mix(in srgb, var(--c) 55%, transparent); }
-.node.sel .bar i { background: linear-gradient(90deg, #FEBF02, #F07800); }
-.nodes.has-sel .node:not(.sel) { opacity: .5; }
-.nodes.has-sel .node:not(.sel):hover { opacity: 1; }
-/* Raíces (OSA Matrix / Colaborations OSA): se pueden pulsar para cambiar de rama */
-.node.root .name { color: #fff; font-weight: 600; }
-.node.root.sel .bar i { background: var(--c); }   /* la raíz elegida queda azul, no naranja */
-/* Pulso al llegar la línea animada */
-.ping .bar i { animation: ping .9s ease-out; }
-@keyframes ping { 0% { filter: brightness(1.8) drop-shadow(0 0 8px var(--c)); } 100% { filter: none; } }
+/* Zona derecha: pista cuando está cerrada, flechas cuando está abierta */
+.mhint { display: flex; align-items: center; gap: 10px; padding-left: 8px; font-size: 13px; color: var(--muted); }
+.mhint svg { width: 18px; height: 18px; color: var(--c); animation: nudge 1.8s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateX(6px); } }
+.mrow.open .mhint { display: none; }
+.mdetail { min-width: 0; overflow-x: auto; scrollbar-width: thin; scrollbar-color: rgba(61, 139, 255, .5) transparent; }
 
-/* Reporte final: borde fino y flecha circular que se rellena al pasar el mouse */
-.report { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px var(--line); transition: background .2s, box-shadow .2s, transform .2s; }
-.report .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.report .name { color: #fff; font-weight: 600; }
-.report .go { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--c); border-radius: 50%; color: var(--c); transition: background .2s, color .2s; }
-.report .go svg { width: 14px; height: 14px; }
-.report:hover .go { background: var(--c); color: #000; }
-.report:hover { box-shadow: inset 0 0 0 1px var(--c); transform: translateY(-1px); }
-.report .ptags { margin-top: 6px; }
-/* Reporte sin enlace: cursor normal, sin elevación y flecha atenuada */
-.report.nolink, .rcard.nolink { cursor: default; }
-.report.nolink:hover, .rcard.nolink:hover { transform: none; }
-.nolink .go, .nolink .rtop svg { opacity: .3; }
-.report.nolink:hover .go { background: transparent; color: var(--c); }
+/* Fila de flechas: "--n" = cantidad de procesos (la escribe el script) */
+.mflow { display: grid; grid-template-columns: repeat(var(--n), minmax(168px, 1fr)); column-gap: 4px; min-width: min-content; animation: reveal .65s cubic-bezier(.3, .8, .3, 1) both; }
+@keyframes reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.mstep { min-width: 0; display: flex; flex-direction: column; gap: 8px; animation: stepin .55s cubic-bezier(.2, .9, .25, 1.05) both; animation-delay: calc(var(--i) * 90ms); }
+@keyframes stepin { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
 
-/* ----- 4.4 Líneas conectoras (SVG): .lk = normal; .lk.on = camino elegido; .flow = puntos que viajan por el camino ----- */
-.lk { fill: none; stroke: rgba(220, 220, 220, .2); stroke-width: 1.3; }
-.lk.on { stroke-width: 2.2; stroke-linecap: round; filter: drop-shadow(0 0 3px currentColor); }
-.flow { fill: none; stroke: var(--silver); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1 20; opacity: .7; animation: dash 1.6s linear infinite, show .4s ease .9s backwards; }
-@keyframes dash { to { stroke-dashoffset: -21; } }
-@keyframes show { from { opacity: 0; } }
+/* Flecha (cabecera de cada proceso). La primera es plana a la izquierda; las demás llevan muesca para encajar */
+.mhead { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 52px; padding: 6px 26px 6px 24px; background: var(--c); color: var(--on); font-size: 12.5px; font-weight: 600; line-height: 1.25;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%, 18px 50%); }
+.mstep:first-child .mhead { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); padding-left: 14px; }
+.mstep:not(:first-child) .mhead { margin-left: -14px; width: calc(100% + 14px); }
+
+/* Reportes debajo de cada flecha */
+.mrep { display: flex; flex-direction: column; gap: 6px; padding-right: 10px; }
+.rp { --c2: var(--c); display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; line-height: 1.3; color: var(--ink); text-decoration: none; transition: background .2s, box-shadow .2s, transform .2s; }
+.rp .rn { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rp svg { flex: none; width: 13px; height: 13px; opacity: 0; transform: translate(-3px, 3px); transition: opacity .2s, transform .2s; color: var(--c2); }
+a.rp:hover { background: rgba(255, 255, 255, .11); box-shadow: inset 0 0 0 1px var(--c2); transform: translateY(-1px); }
+a.rp:hover svg { opacity: 1; transform: none; }
+.rp.soon { cursor: default; font-style: italic; color: var(--muted); background: rgba(255, 255, 255, .02); }
+.rp.soon em { flex: none; font-style: normal; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 
 /* =====================================================================
    5. SECCIÓN "REPORTES": botón-banner y panel con buscador, filtros y tarjetas
@@ -316,9 +293,10 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
 /* =====================================================================
    7. RESPONSIVE (van al final para poder sobrescribir las reglas de arriba)
    ===================================================================== */
-@media (max-width: 1060px) {
-  .swipe { display: block; }
-  .tree-scroll { padding: 16px 16px 22px; }
+@media (max-width: 900px) {
+  .mrow { grid-template-columns: 1fr; }          /* sección arriba, flechas abajo (se deslizan de lado) */
+  .mlabel { min-height: 74px; }
+  .mhint { padding: 0 4px 4px; }
 }
 @media (max-width: 700px) {
   .gl-btn { padding: 6px 12px; }
@@ -339,18 +317,6 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
-/* Árbol de 4 columnas: Total → Sección → Etapa → Reporte */
-.node .count.cad { font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
-.report.soon { cursor: default; background: rgba(255,255,255,.02); }
-.report.soon:hover { box-shadow: inset 0 0 0 1px var(--line); transform: none; }
-.report.soon .name { color: color-mix(in srgb, var(--ink) 80%, transparent); }
-.report.soon .count { color: var(--muted); font-weight: 400; }
-.report.soon .go { display: none; }
-.rcard.soon { cursor: default; }
-.rcard.soon:hover { border-color: var(--line); background: rgba(255,255,255,.04); transform: none; }
-.rcard.soon .rtop svg { display: none; }
-.node.sel .count.cad { color: var(--ink); }
-
 </style>
 </head>
 <body>
@@ -383,8 +349,8 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
       <div class="intro-main">
         <div>
           <p class="eyebrow">Explore. Connect. Discover.</p>
-          <h1>OSA MATRIX</h1>
-          <p>Driving Our E2E Business Performance Management Processes</p>
+          <h1>Driving Our E2E Business Performance Management Processes</h1>
+          <p>Conoce los reportes de OSA Matrix y navega por las diferentes áreas y subprocesos para encontrar la información que impulsa tus decisiones.</p>
         </div>
         <!-- Las 3 cifras las rellena el script (id="kpis"); no escribir números a mano -->
         <div class="kpis" id="kpis"></div>
@@ -401,16 +367,16 @@ a.gl:hover { background: rgba(254, 191, 2, .14); }
       <div class="sec-head">
         <div>
           <h2 id="h-areas">Secciones</h2>
-          <p>Seleccione una sección para desplegar sus procesos y reportes.</p>
+          <p>Haga clic en una sección para desplegar sus procesos y reportes.</p>
+        </div>
+        <div class="sec-tools">
+          <div class="legend"><span><i class="dot"></i>Disponible</span><span><i class="dot soon"></i>Próximamente</span></div>
+          <button class="allbtn" id="allbtn" type="button">Desplegar todo</button>
         </div>
       </div>
 
-      <!-- Ruta (Área › Subproceso + Reiniciar) y árbol: los llena el script -->
-      <nav class="crumbs" id="crumbs" aria-label="Ruta seleccionada"></nav>
-      <div class="tree-card" aria-label="Árbol de reportes">
-        <div class="tree-scroll" id="scroll"><div class="tree" id="tree"></div></div>
-      </div>
-      <div class="swipe">Deslice hacia la derecha para seguir la ruta →</div>
+      <!-- Matriz: una fila por sección; la genera el script (sección "MATRIZ") -->
+      <div class="matrix" id="matrix"></div>
     </section>
   </main>
 </div>
@@ -531,21 +497,15 @@ function slug(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
 function secCount(s) { return s.groups.reduce(function (n, g) { return n + g.reports.length; }, 0); }
 function plural(n) { return n + (n === 1 ? " report" : " reports"); }
 
-/* ============ ESTADO ============ */
-var BASE = "#3D8BFF";
-var COLS = ["root", "sec", "grp", "report"];
-var sel = { sec: null, grp: null };
-var linkSeen = {};
-var kb = false;
+/* ============ AYUDAS ============ */
 var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-var NS = "http://www.w3.org/2000/svg";
 var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
+var BIG_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>';
 var TOTAL = SECTIONS.reduce(function (n, s) { return n + secCount(s); }, 0);
-
-function getSec() { return SECTIONS.find(function (s) { return s.id === sel.sec; }) || null; }
-function getGrp() { var s = getSec(); return s ? s.groups.find(function (g) { return g.name === sel.grp; }) || null : null; }
 function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-function maxOf(arr) { return Math.max.apply(null, arr.concat([1])); }
+
+/* Color del texto sobre cada sección (el dorado necesita texto oscuro para leerse) */
+var TEXT_ON = { soe: "#1A1200" };
 
 /* Cifras de resumen */
 document.getElementById("kpis").innerHTML =
@@ -553,231 +513,58 @@ document.getElementById("kpis").innerHTML =
   '<div class="kpi"><b>' + SECTIONS.length + '</b><span>Secciones</span></div>' +
   '<div class="kpi"><b>' + SECTIONS.reduce(function (n, s) { return n + s.groups.length; }, 0) + '</b><span>Procesos</span></div>';
 
-/* ============ ESTRUCTURA ============ */
-var tree = document.getElementById("tree");
-var scroller = document.getElementById("scroll");
-tree.innerHTML = '<svg class="links" id="links" aria-hidden="true"></svg>' + COLS.map(function (k) {
-  return '<div class="col locked" data-key="' + k + '"><div class="colhead"></div><div class="nodes"></div></div>';
-}).join("");
-var svg = document.getElementById("links");
-function colEl(k) { return tree.querySelector('.col[data-key="' + k + '"]'); }
+/* =====================================================================
+   MATRIZ: cada sección es una fila. Al pulsarla, a la derecha se despliegan
+   sus procesos como flechas y, debajo de cada flecha, sus reportes.
+   ===================================================================== */
+var matrix = document.getElementById("matrix");
 
-function model() {
-  var s = getSec(), g = getGrp();
-  var m = {};
-  m.root = { open: true, blank: true, nodes: [{ kind: "root", key: "root", name: "OSA Matrix", count: TOTAL, max: TOTAL, color: BASE }] };
-
-  var maxS = maxOf(SECTIONS.map(secCount));
-  m.sec = { open: true, label: "Sección", q: "¿Qué sección necesita?", val: s ? s.name : "", clear: !!s,
-    nodes: SECTIONS.map(function (x) { return { kind: "node", col: "sec", id: x.id, key: "sec:" + x.id, name: x.name, legend: x.cadence, count: secCount(x), max: maxS, color: x.color, selected: !!s && s.id === x.id }; }) };
-
-  m.grp = { open: !!s, label: "Proceso", q: "¿Qué proceso?", val: g ? g.label : "", clear: !!g, nodes: [] };
-  if (s) {
-    var maxG = maxOf(s.groups.map(function (x) { return x.reports.length; }));
-    m.grp.nodes = s.groups.map(function (x) { return { kind: "node", col: "grp", id: x.name, key: "grp:" + s.id + "/" + x.name, name: x.label, legend: plural(x.reports.length), count: x.reports.length, max: maxG, color: s.color, selected: !!g && g.name === x.name }; });
-  }
-
-  m.report = { open: !!g, label: "Reporte", q: "Elija uno para abrirlo", val: "", clear: false, nodes: [] };
-  if (g) {
-    m.report.nodes = g.reports.map(function (r, i) { return { kind: "report", idx: i, key: "rep:" + s.id + "/" + g.name + "/" + r.name, name: r.name, url: r.url, color: s.color }; });
-  }
-  return m;
+/* Reporte: con enlace = tarjeta clicable (punto verde); sin enlace = "Soon" (punto vacío) */
+function pill(r) {
+  if (!r.url) return '<span class="rp soon"><i class="dot soon"></i><span class="rn">' + esc(r.name) + '</span><em>Soon</em></span>';
+  return '<a class="rp" href="' + esc(r.url) + '" target="_blank" rel="noopener"><i class="dot"></i><span class="rn">' + esc(r.name) + "</span>" + ARROW + "</a>";
 }
 
-function nodeHTML(n) {
-  var st = "--c:" + n.color;
-  var pct = Math.max(7, Math.round((n.count || 0) / (n.max || 1) * 100));
-  if (n.kind === "report") {
-    if (!n.url) {
-      return '<div class="report soon" data-key="' + esc(n.key) + '" style="' + st + '" aria-disabled="true">' +
-        '<span class="bar"><i style="width:100%"></i></span><span class="row"><span><span class="name">' + esc(n.name) + '</span><span class="count">Soon</span></span></span></div>';
-    }
-    return '<a class="report" data-key="' + esc(n.key) + '" data-report="' + n.idx + '" style="' + st + '" href="' + esc(n.url) + '" target="_blank" rel="noopener">' +
-      '<span class="bar"><i style="width:100%"></i></span><span class="row"><span><span class="name">' + esc(n.name) + '</span><span class="count">Abrir reporte</span></span><span class="go">' + ARROW + '</span></span></a>';
-  }
-  var inner;
-  if (n.kind === "root") inner = '<span class="bar"><i style="width:' + pct + '%"></i></span><span class="name">' + esc(n.name) + '</span><span class="count">' + n.count + '</span>';
-  else inner = '<span class="bar"><i style="width:' + pct + '%"></i></span><span class="name">' + esc(n.name) + '</span><span class="count cad">' + esc(n.legend) + '</span>';
-  if (n.kind === "root") return '<div class="node root" data-key="root" style="' + st + '">' + inner + '</div>';
-  return '<button class="node' + (n.selected ? " sel" : "") + '" data-col="' + n.col + '" data-id="' + esc(n.id) + '" data-key="' + esc(n.key) + '" style="' + st + '" aria-pressed="' + !!n.selected + '">' + inner + '</button>';
-}
-
-function crumbsHTML(s, g) {
-  var h = '<span class="lbl">Ruta</span>';
-  if (!s) return h + '<span class="empty">Seleccione una sección para comenzar</span>';
-  var parts = [
-    { t: s.name, go: "grp", cur: !g, c: s.color },
-    g ? { t: g.label, go: "", cur: true, c: s.color } : null
-  ].filter(Boolean);
-  h += parts.map(function (x, i) {
-    return (i ? '<span class="chev">›</span>' : "") +
-      (x.cur ? '<span class="crumb current" style="--c:' + x.c + '"><i></i>' + esc(x.t) + "</span>"
-             : '<button class="crumb" style="--c:' + x.c + '" data-clear="' + x.go + '"><i></i>' + esc(x.t) + "</button>");
+/* Fila completa de una sección */
+function rowHTML(s) {
+  var steps = s.groups.map(function (g, i) {
+    return '<div class="mstep" style="--i:' + i + '"><div class="mhead"><span>' + esc(g.name) + '</span></div>' +
+      '<div class="mrep">' + g.reports.map(pill).join("") + "</div></div>";
   }).join("");
-  return h + '<button class="reset" id="reset">Reiniciar</button>';
+  return '<article class="mrow" data-id="' + s.id + '" style="--c:' + s.color + ";--on:" + (TEXT_ON[s.id] || "#fff") + '">' +
+    '<button class="mlabel" type="button" aria-expanded="false" aria-controls="d-' + s.id + '">' +
+      '<span class="mname">' + esc(s.name) + "</span>" +
+      '<span class="mcad">' + esc(s.cadence) + "</span>" +
+      '<span class="mcnt">' + s.groups.length + " procesos · " + secCount(s) + " reportes</span>" + BIG_ARROW.replace("<svg", '<svg class="mgo"') +
+    "</button>" +
+    '<div class="mhint">' + BIG_ARROW + "<span>Clic para desplegar los procesos</span></div>" +
+    '<div class="mdetail" id="d-' + s.id + '" hidden><div class="mflow" style="--n:' + s.groups.length + '">' + steps + "</div></div>" +
+  "</article>";
 }
+matrix.innerHTML = SECTIONS.map(rowHTML).join("");
 
-function render(focusCol) {
-  var m = model();
-  var s = getSec(), g = getGrp();
-  tree.style.setProperty("--ac", s ? s.color : BASE);
-
-  COLS.forEach(function (k) {
-    var c = m[k], el = colEl(k);
-    el.classList.toggle("locked", !c.open);
-    var head = el.querySelector(".colhead");
-    head.classList.toggle("blank", !!c.blank);
-    var h = "";
-    if (c.open && !c.blank) {
-      h = "<div><b>" + c.label + "</b>" + (c.val ? '<span class="val">' + esc(c.val) + "</span>" : '<span class="q">' + c.q + "</span>") + "</div>" +
-        (c.clear ? '<button class="x" data-clear="' + k + '" aria-label="Quitar ' + c.label + '">×</button>' : "");
-    }
-    head.innerHTML = h;
-    var nodes = el.querySelector(".nodes");
-    nodes.classList.toggle("has-sel", !!c.val);
-    nodes.innerHTML = c.open ? c.nodes.map(nodeHTML).join("") : "";
-  });
-
-  document.getElementById("crumbs").innerHTML = crumbsHTML(s, g);
-  document.getElementById("sr").textContent = !s ? m.sec.q : !g ? m.grp.q : "Reportes disponibles: " + g.reports.length;
-
-  requestAnimationFrame(function () { drawLinks(true); });
-  if (focusCol) setTimeout(function () { revealCol(focusCol); }, 140);
-  if (kb && focusCol) {
-    var f = colEl(focusCol).querySelector(".node:not(.root), .report");
-    if (f) f.focus({ preventScroll: true });
-  }
+/* Abrir / cerrar una fila (al abrir, la animación CSS se reinicia sola) */
+function setRow(row, open) {
+  row.classList.toggle("open", open);
+  row.querySelector(".mlabel").setAttribute("aria-expanded", open);
+  row.querySelector(".mdetail").hidden = !open;
 }
-
-function revealCol(k) {
-  var el = colEl(k);
-  if (!el || scroller.scrollWidth <= scroller.clientWidth + 2) return;
-  var left = el.offsetLeft, right = left + el.offsetWidth, target = scroller.scrollLeft;
-  if (right + 24 > scroller.scrollLeft + scroller.clientWidth) target = right + 24 - scroller.clientWidth;
-  else if (left - 24 < scroller.scrollLeft) target = Math.max(0, left - 24);
-  scroller.scrollTo({ left: target, behavior: reduce ? "auto" : "smooth" });
+function updateAllBtn() {
+  var rows = matrix.querySelectorAll(".mrow"), n = matrix.querySelectorAll(".mrow.open").length;
+  document.getElementById("allbtn").textContent = n === rows.length ? "Contraer todo" : "Desplegar todo";
 }
-
-/* ============ CONECTORES, BROTES Y PULSOS ============ */
-function pos(el) {
-  var x = 0, y = 0;
-  while (el && el !== tree) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
-  return { x: x, y: y };
-}
-function mk(tag, attrs) {
-  var e = document.createElementNS(NS, tag);
-  for (var k in attrs) e.setAttribute(k, attrs[k]);
-  return e;
-}
-
-var pulses = [], raf = 0;
-function ping(el) { el.classList.remove("ping"); void el.offsetWidth; el.classList.add("ping"); }
-function sendPulse(path, len, delay, dur, target) {
-  var g = mk("g", { opacity: 0 });
-  g.appendChild(mk("circle", { r: 8, fill: "#FEBF02", "fill-opacity": .18 }));
-  g.appendChild(mk("circle", { r: 3, fill: "#FEBF02" }));
-  svg.appendChild(g);
-  pulses.push({ path: path, len: len, t0: performance.now() + delay, dur: dur, g: g, target: target });
-  if (!raf) raf = requestAnimationFrame(tick);
-}
-function tick(now) {
-  pulses = pulses.filter(function (p) {
-    if (!p.path.isConnected) { p.g.remove(); return false; }
-    var t = (now - p.t0) / p.dur;
-    if (t < 0) return true;
-    if (t >= 1) { p.g.remove(); if (p.target && p.target.isConnected) ping(p.target); return false; }
-    var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    var pt = p.path.getPointAtLength(p.len * e);
-    p.g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
-    p.g.setAttribute("opacity", 1);
-    return true;
-  });
-  raf = pulses.length ? requestAnimationFrame(tick) : 0;
-}
-
-function drawLinks(animate) {
-  svg.innerHTML = "";
-  pulses = [];
-  svg.setAttribute("viewBox", "0 0 " + tree.offsetWidth + " " + tree.offsetHeight);
-  var sec = getSec(), nextSeen = {};
-  for (var i = 0; i < COLS.length - 1; i++) {
-    var pc = colEl(COLS[i]), cc = colEl(COLS[i + 1]);
-    if (cc.classList.contains("locked")) continue;
-    var parent = i === 0 ? pc.querySelector(".node.root") : pc.querySelector(".node.sel");
-    if (!parent) continue;
-    var pb = parent.querySelector(".bar"), pp = pos(parent);
-    var x1 = pp.x + pb.offsetLeft + pb.offsetWidth, y1 = pp.y + pb.offsetTop + pb.offsetHeight / 2;
-    var kids = cc.querySelectorAll(".node, .report");
-    var dots = [], idx = 0;
-    kids.forEach(function (k) {
-      var kbar = k.querySelector(".bar"), kp = pos(k);
-      var x2 = kp.x + kbar.offsetLeft, y2 = kp.y + kbar.offsetTop + kbar.offsetHeight / 2;
-      var mx = (x1 + x2) / 2;
-      var d = "M" + x1 + "," + y1 + " C" + mx + "," + y1 + " " + mx + "," + y2 + " " + x2 + "," + y2;
-      var chosen = k.classList.contains("sel") || k.classList.contains("report");
-      var color = k.style.getPropertyValue("--c") || (sec ? sec.color : BASE);
-      var key = (parent.dataset.key || "") + ">" + k.dataset.key;
-      var isNew = !linkSeen[key];
-      nextSeen[key] = 1;
-      var delay = idx * 80;
-
-      var path = mk("path", { d: d, class: "lk" + (chosen ? " on" : "") });
-      if (chosen) { path.setAttribute("stroke", color); path.style.color = color; }
-      svg.appendChild(path);
-      var len = path.getTotalLength();
-      var grow = animate && isNew && !reduce;
-      if (grow) {
-        path.animate([{ strokeDasharray: len + " " + len, strokeDashoffset: len }, { strokeDasharray: len + " " + len, strokeDashoffset: 0 }],
-          { duration: 760, delay: delay, easing: "cubic-bezier(.4,0,.2,1)", fill: "backwards" });
-        k.animate([{ opacity: 0, transform: "translate(" + (x1 - x2) + "px," + (y1 - y2) + "px) scale(.5)" }, { opacity: 1, transform: "none" }],
-          { duration: 780, delay: delay, easing: "cubic-bezier(.2,.9,.25,1.08)", fill: "backwards" });
-        sendPulse(path, len, delay, 760, k);
-      }
-      if (chosen && !reduce) svg.appendChild(mk("path", { d: d, class: "flow" }));
-      dots.push({ x: x2, y: y2, color: color, chosen: chosen, delay: delay, grow: grow });
-      idx++;
-    });
-    svg.appendChild(mk("circle", { cx: x1, cy: y1, r: 3.5, fill: i === 0 ? BASE : (sec ? sec.color : BASE) }));
-    dots.forEach(function (o) {
-      var c = mk("circle", { cx: o.x, cy: o.y, r: o.chosen ? 3.5 : 2.8, fill: o.chosen ? o.color : "#05070D", stroke: o.chosen ? "none" : "#DCDCDC", "stroke-opacity": .45, "stroke-width": 1.1 });
-      svg.appendChild(c);
-      if (o.grow) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, delay: o.delay + 520, fill: "backwards" });
-    });
-  }
-  linkSeen = nextSeen;
-}
-
-/* ============ EVENTOS ============ */
-
-document.addEventListener("keydown", function () { kb = true; });
-document.addEventListener("pointerdown", function () { kb = false; });
-
-document.addEventListener("click", function (e) {
-  var clr = e.target.closest("[data-clear]");
-  if (clr) {
-    var k = clr.dataset.clear;
-    if (k === "sec") { sel.sec = null; sel.grp = null; }
-    if (k === "grp") { sel.grp = null; }
-    render(k); return;
-  }
-  if (e.target.closest("#reset")) {
-    sel.sec = sel.grp = null; render("sec"); return;
-  }
-  if (e.target.closest("[data-report]")) return;
-  var n = e.target.closest(".node[data-col]");
-  if (!n) return;
-  var col = n.dataset.col, id = n.dataset.id, next = "grp";
-  if (col === "sec") { sel.sec = id; sel.grp = null; next = "grp"; }
-  if (col === "grp") { sel.grp = id; next = "report"; }
-  render(next);
+matrix.addEventListener("click", function (e) {
+  var b = e.target.closest(".mlabel");
+  if (!b) return;
+  var row = b.closest(".mrow");
+  setRow(row, !row.classList.contains("open"));
+  updateAllBtn();
 });
-
-function redraw() { requestAnimationFrame(function () { drawLinks(false); }); }
-window.addEventListener("resize", redraw);
-if (window.ResizeObserver) new ResizeObserver(redraw).observe(tree);
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
-
-render();
+document.getElementById("allbtn").addEventListener("click", function () {
+  var rows = matrix.querySelectorAll(".mrow"), all = matrix.querySelectorAll(".mrow.open").length === rows.length;
+  rows.forEach(function (r) { setRow(r, !all); });
+  updateAllBtn();
+});
 
 
 /* ============ LISTADO DE REPORTES ============ */
